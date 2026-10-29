@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob: data: https://*.supabase.co; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Alkitab Vira</title>
+  <meta name="description" content="Alkitab TB, baca harian, ayat tersimpan, dan catatan khotbah.">
+  <meta name="theme-color" content="#F7F3EA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#151A17" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Alkitab Vira">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Semua huruf dalam satu permintaan (Beranda memakai Fraunces, Lora, Nunito) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;1,7..72,400&family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,500&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Nunito:wght@600;700;800&display=swap">
+  <link rel="stylesheet" href="./stylesheet.css">
+</head>
+<body>
+  <!-- Layar memuat / login -->
+  <div id="layar-masuk" class="layar-masuk" hidden>
+    <div class="masuk-isi">
+      <img src="./icon-192.png" alt="" class="masuk-logo" width="72" height="72">
+      <h1 class="masuk-judul">Alkitab Vira</h1>
+      <p class="masuk-teks" id="masuk-teks">Alkitab, baca harian, ayat tersimpan, dan catatan khotbah dalam satu tempat.</p>
+      <button class="tombol tombol-utama tombol-lebar" id="tombol-google" type="button">
+        <span class="ikon-google" aria-hidden="true"></span>
+        Masuk dengan Google
+      </button>
+      <button class="tombol tombol-hantu" id="tombol-keluar-ditolak" type="button" hidden>Keluar dan pakai akun lain</button>
+      <p class="masuk-catatan">Hanya akun pemilik yang bisa membuka isi aplikasi.</p>
+    </div>
+  </div>
+
+  <!-- Aplikasi -->
+  <div id="aplikasi" class="aplikasi" hidden>
+    <header class="kepala" id="kepala">
+      <button class="kepala-kembali" id="tombol-kembali" type="button" aria-label="Kembali" hidden></button>
+      <h1 class="kepala-judul" id="kepala-judul">Beranda</h1>
+      <div class="kepala-aksi" id="kepala-aksi"></div>
+    </header>
+
+    <div class="pita-offline" id="pita-offline" hidden>Tanpa internet · isi yang tersimpan tetap bisa dibuka</div>
+
+    <main id="isi" class="isi" tabindex="-1"></main>
+
+    <!-- Pemutar kecil: tetap terlihat saat pindah menu -->
+    <div class="pemutar" id="pemutar" hidden>
+      <div class="pemutar-garis"><div class="pemutar-maju" id="pemutar-maju"></div></div>
+      <div class="pemutar-baris">
+        <button class="pemutar-info" id="pemutar-info" type="button">
+          <span class="pemutar-judul" id="pemutar-judul"></span>
+          <span class="pemutar-sub" id="pemutar-sub"></span>
+        </button>
+        <button class="ikon-tombol" id="pemutar-mundur" type="button" aria-label="Lagu sebelumnya"></button>
+        <button class="ikon-tombol ikon-bulat" id="pemutar-putar" type="button" aria-label="Putar"></button>
+        <button class="ikon-tombol" id="pemutar-lanjut" type="button" aria-label="Lagu berikutnya"></button>
+      </div>
+    </div>
+
+    <nav class="navigasi" id="navigasi" aria-label="Menu utama">
+      <a href="#/beranda" data-menu="beranda"><span class="nav-ikon" data-ikon="rumah"></span>Beranda</a>
+      <a href="#/alkitab" data-menu="alkitab"><span class="nav-ikon" data-ikon="buku"></span>Alkitab</a>
+      <a href="#/tersimpan" data-menu="tersimpan"><span class="nav-ikon" data-ikon="hati"></span>Tersimpan</a>
+      <a href="#/catatan" data-menu="catatan"><span class="nav-ikon" data-ikon="pena"></span>Catatan</a>
+    </nav>
+  </div>
+
+  <!-- Lembar bawah (pemilih ayat, pilihan, dsb.) -->
+  <div class="lembar-latar" id="lembar-latar" hidden></div>
+  <section class="lembar" id="lembar" role="dialog" aria-modal="true" hidden></section>
+
+  <div class="pesan-kilat" id="pesan-kilat" role="status" aria-live="polite" hidden></div>
+
+  <audio id="audio" preload="metadata"></audio>
+
+  <script src="./javascript.js"></script>
+</body>
+</html>
