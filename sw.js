@@ -2,7 +2,7 @@
    Menyimpan salinan file tampilan & huruf agar aplikasi bisa dibuka tanpa internet.
    Permintaan ke Supabase TIDAK disentuh di sini (data diurus aplikasi sendiri).
    Setiap kali index.html / stylesheet.css / javascript.js diubah, naikkan VERSI. */
-const VERSI = "alkitab-vira-v8";
+const VERSI = "alkitab-vira-v9";
 const HURUF = "alkitab-vira-huruf-v1";
 const FILE = [
   "./",
@@ -19,6 +19,7 @@ const FILE = [
   "./aset/kelopak.png",
   "./aset/buku-terbuka.png",
   "./aset/pita-penanda.png",
+  "./aset/wa-hijau.svg",
 ];
 
 self.addEventListener("install", (e) => {

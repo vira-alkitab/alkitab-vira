@@ -1895,7 +1895,12 @@ function gambarEditor(el, c, baru) {
     location.hash = "#/catatan";
     kilat("Catatan dihapus");
   } }, ikon("sampah"));
-  aturKepala({ judul: "Catatan", kembali: "#/catatan", aksi: [status, tombolHapus] });
+  const tombolWA = h("button", { class: "ikon-tombol", type: "button", "aria-label": "Kirim ke WA", onclick: async () => {
+    if (catatanKosong(c)) { kilat("Catatan masih kosong"); return; }
+    tombolWA.disabled = true; tombolWA.style.opacity = ".4";
+    try { await kirimWA(teksCatatanWA(c)); } finally { tombolWA.disabled = false; tombolWA.style.opacity = ""; }
+  } }, h("img", { src: "./aset/wa-hijau.svg", alt: "", width: "24", height: "24" }));
+  aturKepala({ judul: "Catatan", kembali: "#/catatan", aksi: [status, tombolWA, tombolHapus] });
 
   // Fokus terakhir, supaya ayat disisipkan tepat di posisi kursor.
   let fokus = { indeks: -1, posisi: 0 };
@@ -1936,6 +1941,7 @@ function gambarEditor(el, c, baru) {
   };
 
   const gambarBlok = () => {
+    const y = window.scrollY; // ingat posisi layar, supaya tidak loncat ke atas
     rapikan();
     kosongkan(wadah);
     c.isi.forEach((b, i) => {
@@ -1949,7 +1955,6 @@ function gambarEditor(el, c, baru) {
         // Tetap ditampilkan walau kosong & di tengah, tapi dibuat ramping
         if (!b.teks && i > 0 && i < c.isi.length - 1) ta.style.minHeight = "28px";
         wadah.append(ta);
-        requestAnimationFrame(() => tinggiOtomatis(ta));
       } else {
         const ayat = ayatDari(b.kitab, b.pasal, b.mulai, b.sampai);
         const ref = namaRujukan(b.kitab, b.pasal, b.mulai, b.sampai);
@@ -1962,6 +1967,8 @@ function gambarEditor(el, c, baru) {
             : (D.alkitab ? "Ayat tidak ditemukan." : "Teks ayat muncul setelah Alkitab tersimpan."))));
       }
     });
+    wadah.querySelectorAll("textarea").forEach(tinggiOtomatis);
+    window.scrollTo(0, y);
   };
 
   const sisipkan = (ref) => {
@@ -2010,7 +2017,31 @@ function gambarEditor(el, c, baru) {
   if (baru) requestAnimationFrame(() => judul.focus());
 }
 
-function tinggiOtomatis(ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }
+function tinggiOtomatis(ta) {
+  const y = window.scrollY; // tanpa ini, layar loncat ke atas tiap kali mengetik
+  ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px";
+  window.scrollTo(0, y);
+}
+
+/** Isi catatan jadi teks siap kirim (judul, info, tulisan, ayat). */
+function teksCatatanWA(c) {
+  const info = [c.tanggal && teksTanggal(c.tanggal), c.pengkhotbah && "Pengkhotbah: " + c.pengkhotbah, c.tempat && "Tempat: " + c.tempat].filter(Boolean);
+  const isi = (c.isi || []).map((b) => {
+    if (b.jenis !== "ayat") return b.teks.trim();
+    const a = ayatDari(b.kitab, b.pasal, b.mulai, b.sampai);
+    return `_${namaRujukan(b.kitab, b.pasal, b.mulai, b.sampai)}_\n` + a.map(([n, t]) => (a.length > 1 ? n + " " : "") + t).join(" ");
+  }).filter(Boolean);
+  return [`*${c.judul.trim() || "Catatan khotbah"}*`, info.join("\n"), ...isi].filter(Boolean).join("\n\n");
+}
+
+/** Buka WhatsApp dengan teks siap kirim; kontaknya dipilih di WhatsApp. */
+async function kirimWA(teks) {
+  const url = "https://wa.me/?text=" + encodeURIComponent(teks);
+  if (url.length <= 3500) { kilat("Membuka WhatsApp…"); window.open(url, "_blank", "noopener"); return; }
+  if (navigator.share) { try { await navigator.share({ text: teks }); } catch (e) { if (e.name !== "AbortError") kilat("Gagal membagikan"); } return; }
+  try { await navigator.clipboard.writeText(teks); kilat("Catatan panjang, sudah disalin. Tempel di WhatsApp."); }
+  catch { kilat("Catatan terlalu panjang untuk dikirim"); }
+}
 
 /* ---------------------------------------------------------------------
    15b. AYAT TERSIMPAN (ayat pilihan yang ingin disimpan)
